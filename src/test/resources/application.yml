@@ -1,0 +1,24 @@
+spring:
+  config:
+    import: "optional:configserver:http://localhost:8087"
+  cloud:
+    config:
+      discovery:
+        enabled: false
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+  liquibase:
+    enabled: false
+
+app:
+  jwt:
+    accessToken:
+      secret: "vurghmwnvy8v8tvnu4nytv78h456789_+P87bbeytuv4vbrgigui54h2guwb4u6ugbrjegt78gWK-0iqkrhuihgujnbutgh5utgg"
+      ttl: 86400000
+    refreshToken:
+      secret: "nhetdhirbniote8hbiotth589hfihfgh589tyhgih04hrviorgh85nifgh8trhnvbiurgh89hieh8hrughrh8giur"
