@@ -17,10 +17,7 @@ spring:
     database-change-log-table: storage_database_changelog
     database-change-log-lock-table: storage_database_changelog_lock
   config:
-    import: "optional:configserver:${CONFIG_URL:http://config:8088/}"
-  cloud:
-    config:
-      uri: http://config:8088/
+    import: "optional:configserver:${CONFIG_URL:http://config:8087/}"
   mvc:
     format:
       date: iso
