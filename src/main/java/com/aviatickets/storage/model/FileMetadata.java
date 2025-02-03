@@ -28,6 +28,8 @@ public class FileMetadata {
     private String fileName;
     @Enumerated(EnumType.STRING)
     private SupportedExtension extension;
+    @Enumerated(EnumType.STRING)
+    private FileStatus status;
     private Long size;
     @CreationTimestamp
     private ZonedDateTime uploadedAt;
