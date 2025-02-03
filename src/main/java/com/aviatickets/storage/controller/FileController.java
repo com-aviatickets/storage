@@ -5,10 +5,7 @@ import com.aviatickets.storage.controller.response.FileResponse;
 import com.aviatickets.storage.model.FileMetadata;
 import com.aviatickets.storage.service.FileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -57,6 +54,13 @@ public class FileController {
         };
 
         return ResponseEntity.ok().headers(headers).body(streamingResponseBody);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id,
+                                       @RequestParam(required = false) boolean status) {
+        fileService.delete(id, status);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

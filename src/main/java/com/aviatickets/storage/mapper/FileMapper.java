@@ -12,6 +12,10 @@ public interface FileMapper {
     @Mapping(target = "mimeType", expression = "java(fileMetadata.getExtension().getMimeType())")
     @Mapping(target = "uploadedAt", expression = "java(fileMetadata.getUploadedAt())")
     @Mapping(target = "lastModifiedAt", expression = "java(fileMetadata.getLastModifiedAt())")
+//    @Mapping(target = "status", expression = "java(String.valueOf(fileMetaData.getStatus()))")
     FileResponse toFileResponse(FileMetadata fileMetadata);
+
+
+
 
 }

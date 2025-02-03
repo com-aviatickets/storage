@@ -5,9 +5,13 @@ import com.aviatickets.storage.controller.response.FileResponse;
 import com.aviatickets.storage.mapper.FileMapper;
 import com.aviatickets.storage.model.FileEntity;
 import com.aviatickets.storage.model.FileMetadata;
+import com.aviatickets.storage.model.FileStatus;
 import com.aviatickets.storage.repository.FileEntityRepository;
 import com.aviatickets.storage.repository.FileMetadataRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +29,7 @@ public class FileService {
     private final FileMetadataRepository fileMetadataRepository;
     private final FileEntityRepository fileEntityRepository;
     private final FileMapper mapper;
+    private final SessionFactory sessionFactory;
 
     @Transactional
     public FileResponse upload(MultipartFile file) {
@@ -45,6 +50,7 @@ public class FileService {
                 .fileName(file.getOriginalFilename())
                 .extension(extension)
                 .size(file.getSize())
+                .status(FileStatus.ACTIVE)
                 .build();
 
         fileMetadata = fileMetadataRepository.save(fileMetadata);
@@ -67,5 +73,30 @@ public class FileService {
         fileMetadata = fileMetadata.update(request.fileName());
         return mapper.toFileResponse(fileMetadataRepository.save(fileMetadata));
     }
+
+    @Transactional
+    public void delete(UUID id, boolean isSoftDelete) {
+        FileMetadata fileMetadata = findById(id);
+        if (isSoftDelete) {
+            fileMetadataRepository.delete(fileMetadata);
+        } else {
+            hardDelete(id);
+        }
+    }
+
+    private void hardDelete(UUID id) {
+        Session session = sessionFactory.openSession();
+        session.getTransaction().begin();
+
+        Query<FileMetadata> query = (Query<FileMetadata>) session.createMutationQuery("DELETE FileMetadata fmd WHERE id = :id");
+        query.setParameter("id", id);
+        query.executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+    }
+
+//    private boolean isSoftDelete(SoftDeleteFileRequest request) {
+//        return request.softDelete();
+//    }
 
 }

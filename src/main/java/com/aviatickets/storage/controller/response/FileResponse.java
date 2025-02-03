@@ -10,6 +10,7 @@ public record FileResponse(
         Long size,
         String mimeType,
         ZonedDateTime uploadedAt,
-        ZonedDateTime lastModifiedAt
+        ZonedDateTime lastModifiedAt,
+        String status
 ) {
 }
