@@ -1,5 +1,6 @@
 package com.aviatickets.storage.mapper;
 
+import com.aviatickets.storage.controller.request.UpdateFileRequest;
 import com.aviatickets.storage.controller.response.FileResponse;
 import com.aviatickets.storage.model.FileMetadata;
 import org.mapstruct.Mapper;
@@ -12,10 +13,9 @@ public interface FileMapper {
     @Mapping(target = "mimeType", expression = "java(fileMetadata.getExtension().getMimeType())")
     @Mapping(target = "uploadedAt", expression = "java(fileMetadata.getUploadedAt())")
     @Mapping(target = "lastModifiedAt", expression = "java(fileMetadata.getLastModifiedAt())")
-//    @Mapping(target = "status", expression = "java(String.valueOf(fileMetaData.getStatus()))")
     FileResponse toFileResponse(FileMetadata fileMetadata);
 
-
+    UpdateFileRequest toUpdateFileRequest(FileMetadata fileMetadata);
 
 
 }

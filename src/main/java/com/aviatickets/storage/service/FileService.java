@@ -9,9 +9,6 @@ import com.aviatickets.storage.model.FileStatus;
 import com.aviatickets.storage.repository.FileEntityRepository;
 import com.aviatickets.storage.repository.FileMetadataRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +26,6 @@ public class FileService {
     private final FileMetadataRepository fileMetadataRepository;
     private final FileEntityRepository fileEntityRepository;
     private final FileMapper mapper;
-    private final SessionFactory sessionFactory;
 
     @Transactional
     public FileResponse upload(MultipartFile file) {
@@ -78,25 +74,10 @@ public class FileService {
     public void delete(UUID id, boolean isSoftDelete) {
         FileMetadata fileMetadata = findById(id);
         if (isSoftDelete) {
-            fileMetadataRepository.delete(fileMetadata);
+            fileMetadata.setStatus(FileStatus.DELETED);
+            this.update(id, mapper.toUpdateFileRequest(fileMetadata));
         } else {
-            hardDelete(id);
+            fileMetadataRepository.delete(fileMetadata);
         }
     }
-
-    private void hardDelete(UUID id) {
-        Session session = sessionFactory.openSession();
-        session.getTransaction().begin();
-
-        Query<FileMetadata> query = (Query<FileMetadata>) session.createMutationQuery("DELETE FileMetadata fmd WHERE id = :id");
-        query.setParameter("id", id);
-        query.executeUpdate();
-        session.getTransaction().commit();
-        session.close();
-    }
-
-//    private boolean isSoftDelete(SoftDeleteFileRequest request) {
-//        return request.softDelete();
-//    }
-
 }
