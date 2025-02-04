@@ -2,6 +2,7 @@ package com.aviatickets.storage.service;
 
 import com.aviatickets.storage.controller.request.UpdateFileRequest;
 import com.aviatickets.storage.controller.response.FileResponse;
+import com.aviatickets.storage.exception.UnsupportedOperationException;
 import com.aviatickets.storage.mapper.FileMapper;
 import com.aviatickets.storage.model.FileEntity;
 import com.aviatickets.storage.model.FileMetadata;
@@ -9,6 +10,7 @@ import com.aviatickets.storage.model.FileStatus;
 import com.aviatickets.storage.repository.FileEntityRepository;
 import com.aviatickets.storage.repository.FileMetadataRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import static com.aviatickets.storage.model.FileStatus.DELETED;
 
 @Service
 @RequiredArgsConstructor
@@ -74,10 +78,19 @@ public class FileService {
     public void delete(UUID id, boolean isSoftDelete) {
         FileMetadata fileMetadata = findById(id);
         if (isSoftDelete) {
-            fileMetadata.setStatus(FileStatus.DELETED);
-            this.update(id, mapper.toUpdateFileRequest(fileMetadata));
+            fileMetadata.setStatus(DELETED);
+            fileMetadataRepository.save(fileMetadata);
+        } else if (fileMetadata.getStatus().equals(DELETED)) {
+            throw new UnsupportedOperationException(HttpStatus.BAD_REQUEST, "Try to delete file with status=" + DELETED);
         } else {
             fileMetadataRepository.delete(fileMetadata);
         }
+    }
+
+    @Transactional
+    public FileResponse restore(UUID id) {
+        FileMetadata fileMetadata = findById(id);
+        fileMetadata.setStatus(FileStatus.ACTIVE);
+        return mapper.toFileResponse(fileMetadataRepository.save(fileMetadata));
     }
 }

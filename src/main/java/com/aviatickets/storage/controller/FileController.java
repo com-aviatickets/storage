@@ -63,4 +63,9 @@ public class FileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PatchMapping("/{id}/restore")
+    public FileResponse restore(@PathVariable UUID id) {
+        return fileService.restore(id);
+    }
+
 }
